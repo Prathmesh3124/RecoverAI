@@ -1,0 +1,21 @@
+RECOVERAI - QUICK START
+
+1. Backend PowerShell:
+   cd backend
+   .\venv\Scripts\Activate.ps1
+   uvicorn app.main:app --reload
+
+2. Frontend PowerShell:
+   cd frontend
+   npm run dev
+
+3. Open:
+   http://localhost:5173
+
+4. Demo:
+   Login -> Dashboard -> Analyze -> Execute
+
+Backend API:
+http://127.0.0.1:8000
+Swagger:
+http://127.0.0.1:8000/docs
