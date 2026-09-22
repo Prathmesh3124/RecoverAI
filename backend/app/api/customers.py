@@ -23,6 +23,7 @@ def create_customer(
     current_user: User = Depends(get_current_user),
 ):
     customer = Customer(
+        user_id=current_user.id,
         name=name,
         email=email,
         company=company,
@@ -41,6 +42,10 @@ def get_customers(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    customers = db.query(Customer).all()
+    customers = (
+        db.query(Customer)
+        .filter(Customer.user_id == current_user.id)
+        .all()
+    )
 
     return customers

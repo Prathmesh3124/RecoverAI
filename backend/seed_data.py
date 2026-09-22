@@ -1,15 +1,38 @@
 from app.db.database import SessionLocal
+from app.models.user import User
 from app.models.customer import Customer
 from app.models.payment import Payment
+from app.core.security import hash_password
 
 
 def seed_data():
     db = SessionLocal()
 
     try:
+        # Create demo user
+        demo_email = "demo@recoverai.com"
+
+        demo_user = (
+            db.query(User)
+            .filter(User.email == demo_email)
+            .first()
+        )
+
+        if not demo_user:
+            demo_user = User(
+                name="RecoverAI Demo",
+                email=demo_email,
+                password_hash=hash_password("RecoverAI@123"),
+            )
+
+            db.add(demo_user)
+            db.commit()
+            db.refresh(demo_user)
+
         # Add customers
         customers = [
             Customer(
+                user_id=demo_user.id,
                 name="Priya Sharma",
                 email="priya.sharma@example.com",
                 company="FinEdge Technologies",
@@ -17,6 +40,7 @@ def seed_data():
                 risk_level="High",
             ),
             Customer(
+                user_id=demo_user.id,
                 name="Rahul Verma",
                 email="rahul.verma@example.com",
                 company="CloudNova Systems",
@@ -24,6 +48,7 @@ def seed_data():
                 risk_level="High",
             ),
             Customer(
+                user_id=demo_user.id,
                 name="Sneha Kapoor",
                 email="sneha.kapoor@example.com",
                 company="BrightMart",
@@ -31,6 +56,7 @@ def seed_data():
                 risk_level="Medium",
             ),
             Customer(
+                user_id=demo_user.id,
                 name="Vikram Singh",
                 email="vikram.singh@example.com",
                 company="DataWorks India",
@@ -38,6 +64,7 @@ def seed_data():
                 risk_level="Medium",
             ),
             Customer(
+                user_id=demo_user.id,
                 name="Ananya Patel",
                 email="ananya.patel@example.com",
                 company="GreenLeaf Retail",
@@ -45,6 +72,7 @@ def seed_data():
                 risk_level="Low",
             ),
             Customer(
+                user_id=demo_user.id,
                 name="Rohan Desai",
                 email="rohan.desai@example.com",
                 company="UrbanCart",
@@ -52,6 +80,7 @@ def seed_data():
                 risk_level="High",
             ),
             Customer(
+                user_id=demo_user.id,
                 name="Neha Joshi",
                 email="neha.joshi@example.com",
                 company="PixelCraft",
@@ -59,6 +88,7 @@ def seed_data():
                 risk_level="Low",
             ),
             Customer(
+                user_id=demo_user.id,
                 name="Aditya Rao",
                 email="aditya.rao@example.com",
                 company="ScaleUp Labs",
@@ -74,7 +104,7 @@ def seed_data():
         for customer in customers:
             db.refresh(customer)
 
-        # Add failed payments with different scenarios
+        # Add failed payments
         payments = [
             Payment(
                 customer_id=customers[0].id,
@@ -146,6 +176,8 @@ def seed_data():
         db.commit()
 
         print("Seed data created successfully.")
+        print(f"Demo user: {demo_email}")
+        print("Demo password: RecoverAI@123")
         print(f"Customers added: {len(customers)}")
         print(f"Payments added: {len(payments)}")
 
