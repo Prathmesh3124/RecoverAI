@@ -53,3 +53,81 @@ def health_check():
         "status": "healthy",
         "service": "recoverai-backend",
     }
+
+@app.post("/setup-demo")
+def setup_demo():
+    import sqlite3
+
+    from app.core.security import hash_password
+    from app.db.database import SessionLocal
+    from app.models.user import User
+    from app.models.customer import Customer
+
+    db = SessionLocal()
+
+    try:
+        # Make sure the production database has user_id
+        db_path = "recoverai.db"
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        columns = cursor.execute(
+            "PRAGMA table_info(customers)"
+        ).fetchall()
+
+        column_names = [column[1] for column in columns]
+
+        if "user_id" not in column_names:
+            cursor.execute(
+                "ALTER TABLE customers ADD COLUMN user_id INTEGER REFERENCES users(id)"
+            )
+            conn.commit()
+
+        conn.close()
+
+        # Create demo user if needed
+        demo_email = "demo@recoverai.com"
+
+        demo_user = (
+            db.query(User)
+            .filter(User.email == demo_email)
+            .first()
+        )
+
+        if not demo_user:
+            demo_user = User(
+                name="RecoverAI Demo",
+                email=demo_email,
+                password_hash=hash_password("RecoverAI@123"),
+            )
+            db.add(demo_user)
+            db.commit()
+            db.refresh(demo_user)
+
+        # Assign existing unassigned customers to demo user
+        unassigned = (
+            db.query(Customer)
+            .filter(Customer.user_id == None)
+            .all()
+        )
+
+        for customer in unassigned:
+            customer.user_id = demo_user.id
+
+        db.commit()
+
+        total_customers = (
+            db.query(Customer)
+            .filter(Customer.user_id == demo_user.id)
+            .count()
+        )
+
+        return {
+            "status": "success",
+            "demo_user_id": demo_user.id,
+            "customers_assigned": len(unassigned),
+            "demo_customers": total_customers,
+        }
+
+    finally:
+        db.close()
