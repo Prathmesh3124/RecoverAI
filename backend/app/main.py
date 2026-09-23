@@ -104,7 +104,7 @@ def setup_demo():
             db.commit()
             db.refresh(demo_user)
 
-        # Assign existing unassigned customers to demo user
+               # Assign existing unassigned customers to demo user
         unassigned = (
             db.query(Customer)
             .filter(Customer.user_id == None)
@@ -115,6 +115,84 @@ def setup_demo():
             customer.user_id = demo_user.id
 
         db.commit()
+
+        # Create demo customers if none exist
+        existing_count = (
+            db.query(Customer)
+            .filter(Customer.user_id == demo_user.id)
+            .count()
+        )
+
+        if existing_count == 0:
+            demo_customers = [
+                Customer(
+                    user_id=demo_user.id,
+                    name="Priya Sharma",
+                    email="priya.sharma@example.com",
+                    company="FinEdge Technologies",
+                    total_value=125000,
+                    risk_level="High",
+                ),
+                Customer(
+                    user_id=demo_user.id,
+                    name="Rahul Verma",
+                    email="rahul.verma@example.com",
+                    company="CloudNova Systems",
+                    total_value=68000,
+                    risk_level="High",
+                ),
+                Customer(
+                    user_id=demo_user.id,
+                    name="Sneha Kapoor",
+                    email="sneha.kapoor@example.com",
+                    company="BrightMart",
+                    total_value=32000,
+                    risk_level="Medium",
+                ),
+                Customer(
+                    user_id=demo_user.id,
+                    name="Vikram Singh",
+                    email="vikram.singh@example.com",
+                    company="DataWorks India",
+                    total_value=18500,
+                    risk_level="Medium",
+                ),
+                Customer(
+                    user_id=demo_user.id,
+                    name="Ananya Patel",
+                    email="ananya.patel@example.com",
+                    company="GreenLeaf Retail",
+                    total_value=8500,
+                    risk_level="Low",
+                ),
+                Customer(
+                    user_id=demo_user.id,
+                    name="Rohan Desai",
+                    email="rohan.desai@example.com",
+                    company="UrbanCart",
+                    total_value=52000,
+                    risk_level="High",
+                ),
+                Customer(
+                    user_id=demo_user.id,
+                    name="Neha Joshi",
+                    email="neha.joshi@example.com",
+                    company="PixelCraft",
+                    total_value=14000,
+                    risk_level="Low",
+                ),
+                Customer(
+                    user_id=demo_user.id,
+                    name="Aditya Rao",
+                    email="aditya.rao@example.com",
+                    company="ScaleUp Labs",
+                    total_value=92000,
+                    risk_level="High",
+                ),
+            ]
+
+            db.add_all(demo_customers)
+            db.commit()
 
         total_customers = (
             db.query(Customer)
