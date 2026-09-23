@@ -194,12 +194,25 @@ def setup_demo():
             db.add_all(demo_customers)
             db.commit()
 
+        demo_payments = [
+            Payment(customer_id=1, amount=125000, currency="INR", status="failed", failure_reason="Insufficient funds", attempt_count=2),
+            Payment(customer_id=2, amount=68000, currency="INR", status="failed", failure_reason="Card declined", attempt_count=1),
+            Payment(customer_id=3, amount=32000, currency="INR", status="failed", failure_reason="Payment gateway timeout", attempt_count=2),
+            Payment(customer_id=4, amount=18500, currency="INR", status="failed", failure_reason="Insufficient funds", attempt_count=1),
+            Payment(customer_id=5, amount=8500, currency="INR", status="failed", failure_reason="Card expired", attempt_count=1),
+            Payment(customer_id=6, amount=52000, currency="INR", status="failed", failure_reason="Bank declined transaction", attempt_count=3),
+            Payment(customer_id=7, amount=14000, currency="INR", status="failed", failure_reason="Payment gateway timeout", attempt_count=1),
+            Payment(customer_id=8, amount=92000, currency="INR", status="failed", failure_reason="Insufficient funds", attempt_count=2),
+        ]
+
+        db.add_all(demo_payments)
+        db.commit()
+
         total_customers = (
             db.query(Customer)
             .filter(Customer.user_id == demo_user.id)
             .count()
         )
-
         return {
             "status": "success",
             "demo_user_id": demo_user.id,
