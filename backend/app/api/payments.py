@@ -26,7 +26,8 @@ def create_payment(
     current_user: User = Depends(get_current_user),
 ):
     customer = db.query(Customer).filter(
-        Customer.id == customer_id
+        Customer.id == customer_id,
+        Customer.user_id == current_user.id,
     ).first()
 
     if not customer:
