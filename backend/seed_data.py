@@ -5,181 +5,165 @@ from app.models.payment import Payment
 from app.core.security import hash_password
 
 
+DEMO_EMAIL = "demo@recoverai.com"
+DEMO_PASSWORD = "RecoverAI@123"
+
+
 def seed_data():
     db = SessionLocal()
 
     try:
-        # Create demo user
-        demo_email = "demo@recoverai.com"
-
+        # -------------------------
+        # Demo user
+        # -------------------------
         demo_user = (
             db.query(User)
-            .filter(User.email == demo_email)
+            .filter(User.email == DEMO_EMAIL)
             .first()
         )
 
         if not demo_user:
             demo_user = User(
                 name="RecoverAI Demo",
-                email=demo_email,
-                password_hash=hash_password("RecoverAI@123"),
+                email=DEMO_EMAIL,
+                password_hash=hash_password(DEMO_PASSWORD),
             )
-
             db.add(demo_user)
             db.commit()
             db.refresh(demo_user)
 
-        # Add customers
-        customers = [
-            Customer(
-                user_id=demo_user.id,
-                name="Priya Sharma",
-                email="priya.sharma@example.com",
-                company="FinEdge Technologies",
-                total_value=125000,
-                risk_level="High",
-            ),
-            Customer(
-                user_id=demo_user.id,
-                name="Rahul Verma",
-                email="rahul.verma@example.com",
-                company="CloudNova Systems",
-                total_value=68000,
-                risk_level="High",
-            ),
-            Customer(
-                user_id=demo_user.id,
-                name="Sneha Kapoor",
-                email="sneha.kapoor@example.com",
-                company="BrightMart",
-                total_value=32000,
-                risk_level="Medium",
-            ),
-            Customer(
-                user_id=demo_user.id,
-                name="Vikram Singh",
-                email="vikram.singh@example.com",
-                company="DataWorks India",
-                total_value=18500,
-                risk_level="Medium",
-            ),
-            Customer(
-                user_id=demo_user.id,
-                name="Ananya Patel",
-                email="ananya.patel@example.com",
-                company="GreenLeaf Retail",
-                total_value=8500,
-                risk_level="Low",
-            ),
-            Customer(
-                user_id=demo_user.id,
-                name="Rohan Desai",
-                email="rohan.desai@example.com",
-                company="UrbanCart",
-                total_value=52000,
-                risk_level="High",
-            ),
-            Customer(
-                user_id=demo_user.id,
-                name="Neha Joshi",
-                email="neha.joshi@example.com",
-                company="PixelCraft",
-                total_value=14000,
-                risk_level="Low",
-            ),
-            Customer(
-                user_id=demo_user.id,
-                name="Aditya Rao",
-                email="aditya.rao@example.com",
-                company="ScaleUp Labs",
-                total_value=92000,
-                risk_level="High",
-            ),
+        # -------------------------
+        # Customers
+        # -------------------------
+        customer_data = [
+            {
+                "name": "Priya Sharma",
+                "email": "priya.sharma@example.com",
+                "company": "FinEdge Technologies",
+                "total_value": 125000,
+                "risk_level": "High",
+            },
+            {
+                "name": "Rahul Verma",
+                "email": "rahul.verma@example.com",
+                "company": "CloudNova Systems",
+                "total_value": 68000,
+                "risk_level": "High",
+            },
+            {
+                "name": "Sneha Kapoor",
+                "email": "sneha.kapoor@example.com",
+                "company": "BrightMart",
+                "total_value": 32000,
+                "risk_level": "Medium",
+            },
+            {
+                "name": "Vikram Singh",
+                "email": "vikram.singh@example.com",
+                "company": "DataWorks India",
+                "total_value": 18500,
+                "risk_level": "Medium",
+            },
+            {
+                "name": "Ananya Patel",
+                "email": "ananya.patel@example.com",
+                "company": "GreenLeaf Retail",
+                "total_value": 8500,
+                "risk_level": "Low",
+            },
+            {
+                "name": "Rohan Desai",
+                "email": "rohan.desai@example.com",
+                "company": "UrbanCart",
+                "total_value": 52000,
+                "risk_level": "High",
+            },
+            {
+                "name": "Neha Joshi",
+                "email": "neha.joshi@example.com",
+                "company": "PixelCraft",
+                "total_value": 14000,
+                "risk_level": "Low",
+            },
+            {
+                "name": "Aditya Rao",
+                "email": "aditya.rao@example.com",
+                "company": "ScaleUp Labs",
+                "total_value": 92000,
+                "risk_level": "High",
+            },
         ]
 
-        db.add_all(customers)
-        db.commit()
+        customers = []
 
-        # Refresh customers so we get their database IDs
-        for customer in customers:
-            db.refresh(customer)
+        for data in customer_data:
+            customer = (
+                db.query(Customer)
+                .filter(
+                    Customer.email == data["email"],
+                    Customer.user_id == demo_user.id,
+                )
+                .first()
+            )
 
-        # Add failed payments
-        payments = [
-            Payment(
-                customer_id=customers[0].id,
-                amount=45000,
-                currency="INR",
-                status="failed",
-                failure_reason="Insufficient funds",
-                attempt_count=3,
-            ),
-            Payment(
-                customer_id=customers[1].id,
-                amount=18000,
-                currency="INR",
-                status="failed",
-                failure_reason="Card declined",
-                attempt_count=3,
-            ),
-            Payment(
-                customer_id=customers[2].id,
-                amount=12000,
-                currency="INR",
-                status="failed",
-                failure_reason="Expired card",
-                attempt_count=2,
-            ),
-            Payment(
-                customer_id=customers[3].id,
-                amount=4000,
-                currency="INR",
-                status="failed",
-                failure_reason="Insufficient funds",
-                attempt_count=1,
-            ),
-            Payment(
-                customer_id=customers[4].id,
-                amount=2500,
-                currency="INR",
-                status="failed",
-                failure_reason="Card declined",
-                attempt_count=1,
-            ),
-            Payment(
-                customer_id=customers[5].id,
-                amount=30000,
-                currency="INR",
-                status="failed",
-                failure_reason="Card declined",
-                attempt_count=4,
-            ),
-            Payment(
-                customer_id=customers[6].id,
-                amount=7000,
-                currency="INR",
-                status="failed",
-                failure_reason="Expired card",
-                attempt_count=2,
-            ),
-            Payment(
-                customer_id=customers[7].id,
-                amount=55000,
-                currency="INR",
-                status="failed",
-                failure_reason="Insufficient funds",
-                attempt_count=3,
-            ),
+            if not customer:
+                customer = Customer(
+                    user_id=demo_user.id,
+                    **data,
+                )
+                db.add(customer)
+                db.commit()
+                db.refresh(customer)
+
+            customers.append(customer)
+
+        # -------------------------
+        # Failed payments
+        # -------------------------
+        payment_data = [
+            (0, 45000, "Insufficient funds", 3),
+            (1, 18000, "Card declined", 3),
+            (2, 12000, "Expired card", 2),
+            (3, 4000, "Insufficient funds", 1),
+            (4, 2500, "Card declined", 1),
+            (5, 30000, "Card declined", 4),
+            (6, 7000, "Expired card", 2),
+            (7, 55000, "Insufficient funds", 3),
         ]
 
-        db.add_all(payments)
-        db.commit()
+        payments_added = 0
 
-        print("Seed data created successfully.")
-        print(f"Demo user: {demo_email}")
-        print("Demo password: RecoverAI@123")
-        print(f"Customers added: {len(customers)}")
-        print(f"Payments added: {len(payments)}")
+        for index, amount, failure_reason, attempt_count in payment_data:
+            customer = customers[index]
+
+            existing_payment = (
+                db.query(Payment)
+                .filter(Payment.customer_id == customer.id)
+                .first()
+            )
+
+            if not existing_payment:
+                payment = Payment(
+                    customer_id=customer.id,
+                    amount=amount,
+                    currency="INR",
+                    status="failed",
+                    failure_reason=failure_reason,
+                    attempt_count=attempt_count,
+                )
+                db.add(payment)
+                db.commit()
+                payments_added += 1
+
+        print("Seed data ready.")
+        print(f"Demo user: {DEMO_EMAIL}")
+        print(f"Demo password: {DEMO_PASSWORD}")
+        print(f"Customers available: {len(customers)}")
+        print(f"New payments added: {payments_added}")
+
+    except Exception:
+        db.rollback()
+        raise
 
     finally:
         db.close()

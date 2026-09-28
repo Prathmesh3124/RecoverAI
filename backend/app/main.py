@@ -12,8 +12,10 @@ from app.models.customer import Customer
 from app.models.payment import Payment
 from app.models.recovery_action import RecoveryAction
 from app.models.ai_decision import AIDecision
+from seed_data import seed_data
 
 Base.metadata.create_all(bind=engine)
+seed_data()
 
 app = FastAPI(
     title="RecoverAI API",
